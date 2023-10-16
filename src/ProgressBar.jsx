@@ -4,9 +4,14 @@ const ProgressBar = ({ a, b }) => {
   const percentage = (a / b) * 100;
 
   return (
-    <div className="relative pt-1 w-80">
-      <div className="flex h-4 mb-4 overflow-hidden text-xs bg-teal-200 rounded">
-        <div style={{ width: `${percentage}%` }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-teal-500"></div>
+    <div className="flex items-center px-10 h-full w-full ">
+      <div className="flex h-10 overflow-hidden text-xs bg-teal-200 rounded w-full">
+        <div
+          style={{ width: `${percentage}%` }}
+          className="flex text-center whitespace-nowrap text-white pl-10 py-3 bg-teal-500 "
+        >
+          {percentage.toFixed(2)}% {/* Display the percentage */}
+        </div>
       </div>
     </div>
   );

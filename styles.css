@@ -11,14 +11,79 @@
 
 .grid-container {
   display: grid;
-  grid-template-rows: repeat(2, 1fr); /* 2 rows */
-  grid-template-columns: repeat(3, 1fr); /* 3 columns */
-  gap: 10px; /* Adjust the gap between grid items as needed */
-  padding:20px
+  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 0px; 
+  padding:20px;
+  padding-left: 30px;
+  padding-right: 30px;
 }
 
 .grid-item {
-  border: 1px solid #ddd; /* Add borders or other styles as needed */
-  padding: 20px; /* Adjust padding as needed */
+ 
+  padding: 50px;
   text-align: center;
 }
+
+
+.list-item {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin: 5px;
+  width: 100%;
+  flex-direction: column;
+}
+
+.list-item > div {
+  width: 100%;
+  text-align: center;
+}
+
+.list-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0);
+  transition: background-color 0.3s ease;
+}
+
+.list-item:hover::before {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+
+
+
+.my-table {
+  border-spacing: 0;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.my-table th, .my-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.my-table th {
+  background-color: #f2f2f2;
+}
+
+
+
+
+
+
+
+
+
