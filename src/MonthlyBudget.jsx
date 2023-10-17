@@ -18,7 +18,7 @@ const MonthlyBudget = ({ sums, monthlyBudget, setMonthlyBudget }) => {
         Monthly budget: {monthlyBudget.before}/
         <input
           type="number"
-          style={{ borderBottom: '1px dashed #000', padding: '0 5px', width: '400px' }}
+          style={{ borderBottom: '1px dashed #000', padding: '0 5px', width: '120px' }}
           value={monthlyBudget.after}
           onChange={handleAfterChange}
         />

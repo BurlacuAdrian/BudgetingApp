@@ -1,8 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Modal from './Modal';
 import '../styles.css';
 
-const ExpensesTable = ({ category, data, sum }) => {
+const ExpensesTable = ({ category, modalCat, data, sum }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalData, setModalData] = useState([]);
+  const [fullData, setFullData] = useState(data);
+
+  useEffect(() => {
+    // Update modalData with exactly 6 rows for each category
+    const emptyRows = Array(Math.max(6 - data.length, 0)).fill({ date: '', source: '', amount: '' });
+    setModalData([...data, ...emptyRows]);
+  }, [data]);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -12,16 +21,14 @@ const ExpensesTable = ({ category, data, sum }) => {
     setIsModalOpen(false);
   };
 
-  
-  const paddedData = [...data, ...Array(Math.max(6 - data.length, 0)).fill({ date: '', source: '', amount: '' })];
+  const updateModalData = (updatedData) => {
+    setModalData(updatedData);
+  };
 
+  {console.log(JSON.stringify(fullData,null,2))}
   return (
     <>
-      <table
-        className="my-table w-full h-full"
-        onClick={openModal}
-        style={{ cursor: 'pointer' }}
-      >
+      <table className="my-table w-full h-full" onClick={openModal} style={{ cursor: 'pointer' }}>
         <thead>
           <tr>
             <th>Date</th>
@@ -30,7 +37,7 @@ const ExpensesTable = ({ category, data, sum }) => {
           </tr>
         </thead>
         <tbody>
-          {paddedData.map((entry, index) => (
+          {modalData.map((entry, index) => (
             <tr key={index}>
               <td>{entry.date}</td>
               <td>{entry.source}</td>
@@ -45,14 +52,8 @@ const ExpensesTable = ({ category, data, sum }) => {
         </tbody>
       </table>
 
-      {isModalOpen && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <p>This is your modal content.</p>
-            <button onClick={closeModal}>Close</button>
-          </div>
-        </div>
-      )}
+      {/* Pass the key, closeModal function, modalData, and update function to the Modal component */}
+      {isModalOpen && <Modal key2={modalCat} closeModal={() => setIsModalOpen(false)} modalData={fullData} updateModalData={setFullData} />}
     </>
   );
 };

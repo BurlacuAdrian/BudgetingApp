@@ -75,7 +75,7 @@ function App() {
           ].map((title, index) => (
             <div className="grid-item" key={index}>
               <h1>{title}</h1>
-              <ExpensesTable category={title} data={categoriesData[index] || []} sum={index === 0 ? sumHousing : sumTransportation} />
+              <ExpensesTable category={title}  modalCat={'c'+index} data={categoriesData[index] || []} sum={index === 0 ? sumHousing : sumTransportation} />
             </div>
           ))}
         </div>
