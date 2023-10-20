@@ -8,18 +8,8 @@ function App() {
   const [autoSave, setAutoSave] = useState(true);
   const [sums, setSums] = useState(Array(6).fill(0));
   const [grandSum, setGrandSum] = useState(0)
-  const [monthlyBudget, setMonthlyBudget] = useState({before: 0, after: 3000});
-
-  const categoriesList = [
-    'Housing',
-    'Transportation',
-    'Food and Groceries',
-    'Health and Wellness',
-    'Entertainment',
-    'Personal and Miscellaneous',
-  ]
-
-  const categoriesData = [
+  const [monthlyBudget, setMonthlyBudget] = useState(3000);
+  const [expenses, setExpenses] = useState([
     [
       {
         date: '2023-01-01',
@@ -30,7 +20,7 @@ function App() {
         source: 'Utilities',
         amount: 200
       },
-
+  
     ],
     [
       {
@@ -42,27 +32,47 @@ function App() {
         source: 'Public Transit',
         amount: 30
       },
+  
+    ],[],[],[],[]
+  ])
 
-    ],
-  ]
 
-  const toggleAutoSave = (oldAutoSaveValue) => {
-    setAutoSave(!oldAutoSaveValue);
+  const updateExpensesByCategory = (categoryIndex,newData)=>{
+    
+    setExpenses(oldExpenses => {
+      const updatedExpenses = [...oldExpenses]; 
+      updatedExpenses[categoryIndex] = newData; 
+      console.log(updatedExpenses);
+      return updatedExpenses; 
+    });
+    
+  }
+
+  const [categoriesList,setCategoriesList] = useState([
+    'Housing',
+    'Transportation',
+    'Food and Groceries',
+    'Health and Wellness',
+    'Entertainment',
+    'Personal and Miscellaneous',
+  ])
+
+  const toggleAutoSave = (oldValue) => {
+    setAutoSave(!oldValue);
   };
 
   useEffect(() => {
-    console.log(autoSave);
   }, [autoSave]);
 
   useEffect(() => {
-    const newTotal = sums.reduce((previous, current) => previous + current, 0)
+    const newTotal = sums.reduce((previous, current) => previous + +current, 0)
     setGrandSum(newTotal)
-  })
+  },[sums])
 
   useEffect(() => {
-    const categorySums = categoriesData.map((category) => category.reduce((acc, entry) => acc + entry.amount, 0));
+    const categorySums = expenses.map((category) => category.reduce((acc, entry) => acc + +entry.amount, 0));
     setSums(categorySums);
-  }, [categoriesData]);
+  }, [expenses]);
 
 
   return (
@@ -73,9 +83,7 @@ function App() {
           setMonthlyBudget={setMonthlyBudget}/>
         <div className="w-full flex-1 flex-col items-center justify-center">
           <ProgressBar a={grandSum}
-            b={
-              monthlyBudget.after
-            }/>
+            b={monthlyBudget}/>
         </div>
         <div className="w-full flex-[10] grid-container">
           {
@@ -83,15 +91,15 @@ function App() {
             <div className="grid-item"
               key={index}>
               <h1>{title}</h1>
-              <ExpensesTable category={title}
-                modalCat={
-                  'c' + index
+              <ExpensesTable categoryTitle={title}
+                categoryIndex={
+                  index}
+                expenses={
+                  expenses[index]||[]
                 }
-                data={
-                  categoriesData[index] || []
-                }
+                updateExpensesByCategory={updateExpensesByCategory}
                 sum={
-                  sums[index] ? sums[index] : 0
+                  sums[index] || 0
                 }/>
             </div>
           ))

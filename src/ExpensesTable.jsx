@@ -2,16 +2,24 @@ import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
 import '../styles.css';
 
-const ExpensesTable = ({ category, modalCat, data, sum }) => {
+const ExpensesTable = ({ categoryTitle, categoryIndex, expenses, updateExpensesByCategory,sum }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalData, setModalData] = useState([]);
-  const [fullData, setFullData] = useState(data);
+  const [previewData, setPreviewData] = useState([]);
+
+  // console.log("EXPENSES for "+categoryTitle)
+  // console.log(expenses)
 
   useEffect(() => {
-    // Update modalData with exactly 6 rows for each category
-    const emptyRows = Array(Math.max(6 - data.length, 0)).fill({ date: '', source: '', amount: '' });
-    setModalData([...data, ...emptyRows]);
-  }, [data]);
+
+    const newData = expenses.filter((item) => item.date !== '' && item.source !== '' && item.amount !== '');
+    const count = newData.length;
+
+    console.log(Math.max(6 - count, 0))
+    Array(Math.max(6 - count, 0)).fill({ date: '', source: '', amount: '' }).forEach((element,index)=>{
+      newData.push(element)
+    })
+    setPreviewData(newData)
+  }, [expenses]);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -21,11 +29,6 @@ const ExpensesTable = ({ category, modalCat, data, sum }) => {
     setIsModalOpen(false);
   };
 
-  const updateModalData = (updatedData) => {
-    setModalData(updatedData);
-  };
-
-  {console.log(JSON.stringify(fullData,null,2))}
   return (
     <>
       <table className="my-table w-full h-full" onClick={openModal} style={{ cursor: 'pointer' }}>
@@ -37,7 +40,7 @@ const ExpensesTable = ({ category, modalCat, data, sum }) => {
           </tr>
         </thead>
         <tbody>
-          {modalData.map((entry, index) => (
+          {previewData.map((entry, index) => (
             <tr key={index}>
               <td>{entry.date}</td>
               <td>{entry.source}</td>
@@ -52,8 +55,8 @@ const ExpensesTable = ({ category, modalCat, data, sum }) => {
         </tbody>
       </table>
 
-      {/* Pass the key, closeModal function, modalData, and update function to the Modal component */}
-      {isModalOpen && <Modal key2={modalCat} closeModal={() => setIsModalOpen(false)} modalData={fullData} updateModalData={setFullData} />}
+      {/* Pass the key, closeModal function, previewData, and update function to the Modal component */}
+      {isModalOpen && <Modal categoryIndex={categoryIndex} closeModal={closeModal} expenses={expenses} updateExpensesByCategory={updateExpensesByCategory} />}
     </>
   );
 };
