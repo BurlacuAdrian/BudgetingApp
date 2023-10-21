@@ -14,30 +14,7 @@ function App() {
   const [userMonth, setUserMonth] = useState((new Date).getMonth()+1)
   const [userYear, setUserYear] = useState((new Date).getFullYear())
   const [expenses, setExpenses] = useState([
-    [
-      {
-        date: '2023-10-01',
-        source: 'Rent',
-        amount: 1200
-      }, {
-        date: '2023-10-05',
-        source: 'Utilities',
-        amount: 200
-      },
-  
-    ],
-    [
-      {
-        date: '2023-10-02',
-        source: 'Gas',
-        amount: 50
-      }, {
-        date: '2023-10-06',
-        source: 'Public Transit',
-        amount: 30
-      },
-  
-    ],[],[],[],[]
+    [],[],[],[],[],[]
   ])
   const [categoriesList,setCategoriesList] = useState([
     'Housing',
@@ -50,6 +27,7 @@ function App() {
   const [username,setUsername]=useState("")
   const [showPopup, setShowPopup] = useState(false);
   
+  //Popup animation
   useEffect(() => {
     if (showPopup) {
       const popUpTimer = setTimeout(() => {
@@ -62,7 +40,7 @@ function App() {
     }
   }, [showPopup]);
 
-
+  //Auto-save logic
   const [timer, setTimer] = useState(null);
   const editingRef = useRef(false);
   useEffect(() => {
@@ -82,6 +60,7 @@ function App() {
     };
   }, [autoSave]);
 
+  //Pauses the auto-save if the user is currently changing the month or year
   const handleResetTimer = () => {
     editingRef.current = true;
     // console.log("editing is " + editingRef.current);
@@ -91,8 +70,6 @@ function App() {
       // console.log("editing is " + editingRef.current);
     }, 8000);
   };
-
-
 
   const showSuccessPopup = () => {
     setShowPopup(true);
@@ -122,12 +99,18 @@ function App() {
     }
   }
   
-  // Call the function to check and set the username
-  useEffect(()=>{
+  //On-load, when component is mounted
+  useEffect(() => {
     checkAndSetUsername();
 
-  },[])
-  
+    getExpensesFromAPI()
+      .then((data) => {
+        setExpenses(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching expenses:", error);
+      });
+  }, []);
 
   const saveChangesToAPI = async ()=>{
     const payload = {
@@ -155,13 +138,12 @@ function App() {
 
   }
 
-
   const getExpensesFromAPI = async ()=>{
     const payload = {
-      "username": username,
-      "subdocument": {
-        "month": userMonth,
-        "year": userYear
+      username: username,
+      subdocument: {
+        month: userMonth,
+        year: userYear
       }
     }
 
@@ -174,42 +156,31 @@ function App() {
     })
     const dataReceived = await response.json()
     const newExpenses = dataReceived.expenses;
-    // console.log(payload)
-    // console.log(newExpenses)
-    setExpenses(newExpenses)
     return newExpenses
   }
 
   const refreshExpenses = async ()=>{
-    await getExpensesFromAPI()
+    // await saveChangesToAPI()
+    setExpenses(await getExpensesFromAPI())
   }
 
+  //Update the expenses from a modified ExpensesTable
   const updateExpensesByCategory = (categoryIndex,newData)=>{
-    
     setExpenses(oldExpenses => {
       const updatedExpenses = [...oldExpenses]; 
       updatedExpenses[categoryIndex] = newData; 
-      // console.log(updatedExpenses);
       return updatedExpenses; 
     });
     
   }
 
-  
-
-  const toggleAutoSave = (oldValue) => {
-    showSuccessPopup()
-    setAutoSave(!oldValue);
-  };
-
-  useEffect(() => {
-  }, [autoSave]);
-
+  //Calculate the grand total of all sums
   useEffect(() => {
     const newTotal = sums.reduce((previous, current) => previous + +current, 0)
     setGrandSum(newTotal)
   },[sums])
 
+  //Calculate the sum of the expenses for each category
   useEffect(() => {
     const categorySums = expenses.map((category) => category.reduce((acc, entry) => acc + +entry.amount, 0));
     setSums(categorySums);

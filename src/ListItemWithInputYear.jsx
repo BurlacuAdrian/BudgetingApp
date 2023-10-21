@@ -1,6 +1,6 @@
 import React, { useCallback, useState,useEffect,useRef } from 'react';
 
-const ListItemWithInputYear = ({ label, inputId, inputCheckType,userYear, setUserYear,handleResetTimer}) => {
+const ListItemWithInputYear = ({ label, inputId,userYear, setUserYear,handleResetTimer}) => {
   const [inputValue, setInputValue] = useState(userYear);
   const inputRef = useRef(null);
   
@@ -12,41 +12,23 @@ const ListItemWithInputYear = ({ label, inputId, inputCheckType,userYear, setUse
   const handleInputChange = (event) => {
     const newValue = event.target.value;
 
-    switch(inputCheckType){
-      case 0://month
-        if (/^(1[0-2]?|[1-9]?)?$/.test(newValue)) {
-          setInputValue(newValue);
-        }
-        break;
-      case 1:
-         // if (//.test(newValue)) {
-        setInputValue(newValue);
-         // }
-        break;
-      default:
-        setInputValue(newValue);
-    }
+    // if (//.test(newValue)) {
+    setInputValue(newValue);
   };
 
   const handleData = () => {
-    // Implement your logic for handling data here
-    // This function will be called when Enter is pressed
-    // console.log('Data submitted:', inputValue);
     setUserYear(+inputValue)
   };
 
   useEffect(() => {
     const handleKeyPress = (event) => {
       if (event.key === 'Enter') {
-        // Call the handleData function when Enter is pressed
         handleData();
       }
     };
 
-    // Attach the event listener to the input element
     inputRef.current.addEventListener('keypress', handleKeyPress);
 
-    // Clean up the event listener when the component unmounts
     return () => {
       if (inputRef.current) {
         inputRef.current.removeEventListener('keypress', handleKeyPress);
@@ -70,7 +52,7 @@ const ListItemWithInputYear = ({ label, inputId, inputCheckType,userYear, setUse
           id={inputId}
           value={inputValue}
           onChange={handleInputChange}
-          ref={inputRef} // Attach the ref to the input element
+          ref={inputRef}
           style={{ borderColor: /^[1-9]$|1[0-2]$/.test(inputValue) ? '' : 'red' }}
         />
       </div>
