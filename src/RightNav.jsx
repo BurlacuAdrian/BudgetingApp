@@ -1,52 +1,28 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState,useEffect,useRef } from 'react';
+import ListItemWithInputMonth from './ListItemWithInputMonth'
+import ListItemWithInputYear from './ListItemWithInputYear';
 
-const ListItemWithInput = ({ label, inputId }) => {
-  const [inputValue, setInputValue] = useState('');
-
-  const selectInput = useCallback(() => {
-    document.getElementById(inputId).focus();
-  }, [inputId]);
-
-  const handleInputChange = (event) => {
-    const newValue = event.target.value;
-
-    if (/^(1[0-2]?|[1-9]?)?$/.test(newValue)) {
-      setInputValue(newValue);
-    }
-  };
-
-  return (
-    <li className="list-item" onClick={selectInput}>
-      <div style={{ marginBottom: '5px' }}>
-        <label htmlFor={inputId}>{label}</label>
-      </div>
-      <div>
-        <input
-          type="text"
-          id={inputId}
-          value={inputValue}
-          onChange={handleInputChange}
-          style={{ borderColor: /^[1-9]$|1[0-2]$/.test(inputValue) ? '' : 'red' }}
-        />
-      </div>
-    </li>
-  );
-};
-
-const RightNav = ({ onAutoSaveToggle }) => {
-  const [autoSave, setAutoSave] = useState(true);
+const RightNav = ({ autoSave,setAutoSave,userMonth, setUserMonth,userYear, setUserYear, saveChangesToAPI,refreshExpenses,showPopup,showSuccessPopup,handleResetTimer}) => {
+  // const [autoSave, setAutoSave] = useState(false);
 
   const toggleAutoSave = () => {
     setAutoSave(!autoSave);
-    onAutoSaveToggle(!autoSave); 
+    // onAutoSaveToggle(!autoSave); 
   };
 
   return (
     <ul className="h-full flex-[1] flex flex-col justify-evenly items-center bg-teal-200">
       <li className="list-item">Account</li>
-      <ListItemWithInput label="Month" inputId="month" />
-      <ListItemWithInput label="Year" inputId="year" />
-      <li className="list-item">Save changes</li>
+      <ListItemWithInputMonth label="Month" inputId="month"
+       inputCheckType={0} userMonth={userMonth} setUserMonth={setUserMonth}
+       handleResetTimer={handleResetTimer}
+      />
+      <ListItemWithInputYear label="Year" inputId="year"
+      inputCheckType={1} userYear={userYear} setUserYear={setUserYear}
+      handleResetTimer={handleResetTimer}
+      />
+      <li className="list-item" onClick={refreshExpenses}>Refresh data</li>
+      <li className="list-item" onClick={saveChangesToAPI}>Save changes</li>
       <li className="list-item" onClick={toggleAutoSave}>
         Auto-save: {autoSave ? 'On' : 'Off'}
       </li>

@@ -9,7 +9,7 @@ const MonthlyBudget = ({ sums, monthlyBudget, setMonthlyBudget }) => {
   };
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 w-9/12 inline-block">
       <h1 className="text-4xl flex items-center h-full pl-10">
         Monthly budget: {grandSum}/
         <input

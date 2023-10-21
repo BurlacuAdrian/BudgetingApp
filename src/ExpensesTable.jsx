@@ -14,7 +14,7 @@ const ExpensesTable = ({ categoryTitle, categoryIndex, expenses, updateExpensesB
     const newData = expenses.filter((item) => item.date !== '' && item.source !== '' && item.amount !== '');
     const count = newData.length;
 
-    console.log(Math.max(6 - count, 0))
+    // console.log(Math.max(6 - count, 0))
     Array(Math.max(6 - count, 0)).fill({ date: '', source: '', amount: '' }).forEach((element,index)=>{
       newData.push(element)
     })
