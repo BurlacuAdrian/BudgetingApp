@@ -99,6 +99,26 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
+.popup {
+  position: absolute;
+  top: -60px;
+  right: 230px;
+  width: 180px;
+  height: 50px;
+  border-radius: 6px;
+  background-color: #4CAF50;
+  color: white;
+  padding: 16px;
+  text-align: center;
+  transition: top 0.3s ease-in-out;
+  z-index: 1;
+}
+
+.popup.show {
+  top: 5px;
+}
+
+
 
 
 
