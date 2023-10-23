@@ -55,7 +55,6 @@ const ExpensesTable = ({ categoryTitle, categoryIndex, expenses, updateExpensesB
         </tbody>
       </table>
 
-      {/* Pass the key, closeModal function, previewData, and update function to the Modal component */}
       {isModalOpen && <Modal categoryIndex={categoryIndex} closeModal={closeModal} expenses={expenses} updateExpensesByCategory={updateExpensesByCategory} />}
     </>
   );

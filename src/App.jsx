@@ -4,6 +4,8 @@ import ProgressBar from './ProgressBar';
 import RightNav from './RightNav';
 import ExpensesTable from './ExpensesTable';
 import '../styles.css'
+import { useGuestMode } from './GuestModeContext';
+import Cookies from 'js-cookie';
 
 function App() {
   const AUTOSAVE_INTERVAL = 1000*120;
@@ -26,6 +28,7 @@ function App() {
   ])
   const [username,setUsername]=useState("")
   const [showPopup, setShowPopup] = useState(false);
+  const { guestMode } = useGuestMode();
   
   //Popup animation
   useEffect(() => {
@@ -76,32 +79,111 @@ function App() {
   };
 
   function checkAndSetUsername() {
-    // Check if the username is already in localStorage
     const storedUsername = localStorage.getItem('username');
 
     if (storedUsername) {
-      // If the username is in localStorage, update the state with the stored value
       setUsername(storedUsername);
       // alert(`Hello, ${storedUsername}!`);
     } else {
-      // Prompt the user for their username
       const enteredUsername = prompt('Please enter your username:');
 
       if (enteredUsername) {
-        // Save the entered username in localStorage and update the state
         localStorage.setItem('username', enteredUsername);
         setUsername(enteredUsername);
         alert(`Hello, ${enteredUsername}! Your username has been saved.`);
       } else {
-        // User canceled the prompt or entered an empty username
         alert('You must enter a username to continue.');
       }
     }
+  }
+
+  const handleSampleData = ()=>{
+    const sampleExample = [
+      [
+        {
+          "date": "2023-10-01",
+          "source": "Rent",
+          "amount": 1500.00
+        },
+        {
+          "date": "2023-10-15",
+          "source": "Utilities",
+          "amount": 200.00
+        }
+      ],
+      [
+        {
+          "date": "2023-10-03",
+          "source": "Gasoline",
+          "amount": 50.00
+        },
+        {
+          "date": "2023-10-18",
+          "source": "Public Transportation",
+          "amount": 30.00
+        }
+      ],
+      [
+        {
+          "date": "2023-10-05",
+          "source": "Grocery Store",
+          "amount": 100.00
+        },
+        {
+          "date": "2023-10-20",
+          "source": "Dining Out",
+          "amount": 60.00
+        }
+      ],
+      [
+        {
+          "date": "2023-10-08",
+          "source": "Health Insurance",
+          "amount": 250.00
+        },
+        {
+          "date": "2023-10-22",
+          "source": "Gym Membership",
+          "amount": 30.00
+        }
+      ],
+      [
+        {
+          "date": "2023-10-12",
+          "source": "Movie Theater",
+          "amount": 20.00
+        },
+        {
+          "date": "2023-10-25",
+          "source": "Video Games",
+          "amount": 40.00
+        }
+      ],
+      [
+        {
+          "date": "2023-10-14",
+          "source": "Clothing",
+          "amount": 75.00
+        },
+        {
+          "date": "2023-10-28",
+          "source": "Gifts",
+          "amount": 50.00
+        }
+      ]
+    ]
+    
+    setExpenses(sampleExample)
   }
   
   //On-load, when component is mounted
   useEffect(() => {
     checkAndSetUsername();
+
+    if(guestMode.current==true){
+      handleSampleData()
+      return
+    }
 
     getExpensesFromAPI()
       .then((data) => {
@@ -111,6 +193,30 @@ function App() {
         console.error("Error fetching expenses:", error);
       });
   }, []);
+
+  function getUsernameFromJWT() {
+     const jwtCookie = Cookies.get('JWT');
+  
+    if (!jwtCookie) {
+      return null;
+    }
+  
+    const parts = jwtCookie.split('.');
+    if (parts.length !== 3) {
+      return null; 
+    }
+  
+    const payload = atob(parts[1]);
+
+    const payloadObj = JSON.parse(payload);
+  
+    const JWTusername = payloadObj.username;
+    // console.log(JWTusername)
+  
+    return JWTusername;
+  }
+
+  // getUsernameFromJWT()
 
   const saveChangesToAPI = async ()=>{
     const payload = {
@@ -146,7 +252,6 @@ function App() {
         year: userYear
       }
     }
-
     const response = await fetch('http://127.0.0.1:8080/getExpenses', {
       method:'POST',
       headers: {
@@ -154,6 +259,8 @@ function App() {
       },
       body:JSON.stringify(payload)
     })
+    if(response.status!=200 || response.status!=202)
+      return [[], [], [], [], [], []]
     const dataReceived = await response.json()
     const newExpenses = dataReceived.expenses;
     return newExpenses
@@ -216,8 +323,9 @@ function App() {
                 }
                 updateExpensesByCategory={updateExpensesByCategory}
                 sum={
-                  sums[index] || 0
-                }/>
+                  sums[index] || 0 
+                }
+                />
             </div>
           ))
         } </div>
@@ -231,6 +339,9 @@ function App() {
       showPopup={showPopup}
       showSuccessPopup={showSuccessPopup}
       handleResetTimer={handleResetTimer}
+      setExpenses={setExpenses}
+      guestMode={guestMode}
+      handleSampleData={handleSampleData}
       />
       
     </>
