@@ -5,7 +5,7 @@ import RightNav from './RightNav';
 import ExpensesTable from './ExpensesTable';
 import '../styles.css'
 import { useGuestMode } from './GuestModeContext';
-import Cookies from 'js-cookie';
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
   const AUTOSAVE_INTERVAL = 1000*120;
@@ -175,10 +175,32 @@ function App() {
     
     setExpenses(sampleExample)
   }
+
+  const isJWTValid = () => {
+    var storedUserType = localStorage.getItem("userType");
+    if(storedUserType && storedUserType=="user"){
+      guestMode.current=false
+      return true
+    }
+    return false
+
+  };
+
+  const checkUserType = () =>{
+    if(isJWTValid()==false){
+      console.log("guest mode")
+      guestMode.current=true
+    }
+    else{
+      guestMode.current=false
+      console.log("user mode")
+    }
+  }
   
   //On-load, when component is mounted
   useEffect(() => {
-    checkAndSetUsername();
+    // checkAndSetUsername();
+    checkUserType(0)
 
     if(guestMode.current==true){
       handleSampleData()
@@ -194,29 +216,34 @@ function App() {
       });
   }, []);
 
-  function getUsernameFromJWT() {
-     const jwtCookie = Cookies.get('JWT');
-  
-    if (!jwtCookie) {
-      return null;
+  const saveChangesRouter = () => {
+    if (guestMode.current === false) {
+      saveChangesToAPI();
+      return;
     }
   
-    const parts = jwtCookie.split('.');
-    if (parts.length !== 3) {
-      return null; 
+    let subdocument = {
+      month: userMonth,
+      year: userYear,
+      expenses: expenses,
+    };
+  
+    var storedData = localStorage.getItem("localExpenses");
+    var jsonArray = storedData ? JSON.parse(storedData) : [];
+  
+    var existingIndex = jsonArray.findIndex(item => item.month === userMonth && item.year === userYear);
+  
+    if (existingIndex !== -1) {
+      jsonArray[existingIndex] = subdocument;
+    } else {
+      jsonArray.push(subdocument);
     }
   
-    const payload = atob(parts[1]);
-
-    const payloadObj = JSON.parse(payload);
+    var updatedData = JSON.stringify(jsonArray);
   
-    const JWTusername = payloadObj.username;
-    // console.log(JWTusername)
-  
-    return JWTusername;
+    localStorage.setItem("localExpenses", updatedData);
   }
-
-  // getUsernameFromJWT()
+  
 
   const saveChangesToAPI = async ()=>{
     const payload = {
@@ -228,8 +255,9 @@ function App() {
       }
     }
 
-    const response = await fetch('http://127.0.0.1:8080/saveExpenses', {
+    const response = await fetch(VITE_API_URL+'/saveExpenses', {
       method:'POST',
+      credentials:'include',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -244,6 +272,23 @@ function App() {
 
   }
 
+  const getExpensesRouter = ()=>{
+    if (guestMode.current === false) {
+      refreshExpenses();
+      return;
+    }
+
+    var storedData = localStorage.getItem("localExpenses");
+    var jsonArray = storedData ? JSON.parse(storedData) : [];
+    var existingIndex = jsonArray.findIndex(item => item.month === userMonth && item.year === userYear);
+    // console.log(jsonArray[existingIndex].expenses)
+    if (existingIndex !== -1) {//found
+      setExpenses(jsonArray[existingIndex].expenses)
+    } else {
+      setExpenses([[],[],[],[],[],[]])
+    }
+  }
+
   const getExpensesFromAPI = async ()=>{
     const payload = {
       username: username,
@@ -252,15 +297,19 @@ function App() {
         year: userYear
       }
     }
-    const response = await fetch('http://127.0.0.1:8080/getExpenses', {
+    const response = await fetch(VITE_API_URL+'/getExpenses', {
       method:'POST',
+      credentials:'include',
       headers: {
         'Content-Type': 'application/json',
       },
       body:JSON.stringify(payload)
     })
-    if(response.status!=200 || response.status!=202)
+    // console.log(response.status)
+    if(response.status!=200 && response.status!=202){
+      // console.log('here')
       return [[], [], [], [], [], []]
+    }
     const dataReceived = await response.json()
     const newExpenses = dataReceived.expenses;
     return newExpenses
@@ -271,7 +320,6 @@ function App() {
     setExpenses(await getExpensesFromAPI())
   }
 
-  //Update the expenses from a modified ExpensesTable
   const updateExpensesByCategory = (categoryIndex,newData)=>{
     setExpenses(oldExpenses => {
       const updatedExpenses = [...oldExpenses]; 
@@ -334,8 +382,8 @@ function App() {
       setAutoSave={setAutoSave}
       userMonth={userMonth} setUserMonth={setUserMonth}
       userYear={userYear} setUserYear={setUserYear}
-      saveChangesToAPI={saveChangesToAPI}
-      refreshExpenses={refreshExpenses}
+      saveChangesToAPI={saveChangesRouter}
+      refreshExpenses={getExpensesRouter}
       showPopup={showPopup}
       showSuccessPopup={showSuccessPopup}
       handleResetTimer={handleResetTimer}

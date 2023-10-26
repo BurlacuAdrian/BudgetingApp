@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const SignupPage = () => {
         return;
       }
 
-      const response = await fetch('http://127.0.0.1:8080/signup', {
+      const response = await fetch(VITE_API_URL+'/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -47,8 +48,8 @@ const SignupPage = () => {
   };
 
   return (
-    <div className="flex-1 relative top-1/4 left-1/4">
-      <div className="w-1/2 h-1/2 bg-gray-100 p-8 rounded-md flex flex-col justify-between">
+    <div className="flex-1 relative top-1/4 left-1/4 ">
+      <div className="w-1/2 h-2/3 bg-gray-100 p-8 rounded-md flex flex-col justify-between">
         <div className="text-2xl font-bold text-center">Create an Account</div>
         <input
           type="text"
@@ -82,6 +83,9 @@ const SignupPage = () => {
           className="h-15 text-black p-2 rounded-md hover:bg-teal-200 text-center w-full"
         >
           <button>Already have an account? Sign in</button>
+        </Link>
+        <Link to="/dashboard" className="h-20 flex items-center justify-center bg-teal-300 text-white p-2 rounded-md hover:bg-teal-600"
+        ><p className='text-center'>Guest mode</p>
         </Link>
       </div>
     </div>

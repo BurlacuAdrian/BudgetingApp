@@ -39,12 +39,17 @@ const RightNav = ({ autoSave,setAutoSave,userMonth, setUserMonth,userYear, setUs
       console.log("user mode")
   }
 
-checkUserType()
+// checkUserType()
+
+const handleLogout=()=>{
+  console.log("called")
+  localStorage.setItem("userType","guest")
+}
 
   return (
     <ul className="h-full flex-[1] flex flex-col justify-evenly items-center bg-teal-200">
-      {!guestMode.current ? (<Link to='/login'  className="list-item">
-        <li>Logout</li>
+      {!guestMode.current ? (<Link to='/login'  className="list-item" onClick={handleLogout}>
+        <p>Logout</p>
       </Link>) : 
       (<Link to='/login'  className="list-item">
       <li>Currently in<br></br>Guest mode</li>
@@ -62,7 +67,7 @@ checkUserType()
       <li className="list-item" onClick={saveChangesToAPI}>Save changes</li>
       {/* <li className="list-item">Generate PDF</li> */}
       <button className="list-item" onClick={handleSampleData}>Sample data</button>
-      {console.log(guestMode.current)}
+      {/* {console.log(guestMode.current)} */}
       {!guestMode.current ? (
         <li className="list-item" onClick={toggleAutoSave}>
           Auto-save: {autoSave ? 'On' : 'Off'}
